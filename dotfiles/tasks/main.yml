@@ -1,0 +1,15 @@
+---
+  - name: Add dotfiles
+    template: src={{ item.template }} dest=~{{ dotfiles_user }}/{{ item.dest }} owner={{ dotfiles_user }}
+    with_items:
+        - { template: bash_prompt.j2, dest: .bash_prompt }
+        - { template: inputrc.j2, dest: .inputrc }
+        - { template: profile.j2, dest: .profile }
+        - { template: gitconfig.j2, dest: .gitconfig }
+
+  - name: Symfony2 autocomplete
+    git: repo=https://github.com/KnpLabs/symfony2-autocomplete.git dest=~{{ dotfiles_user }}/symfony2-autocomplete
+
+  - name: Symfony2 autocomplete symlink
+    file: src=~{{ dotfiles_user }}/symfony2-autocomplete/symfony2-autocomplete.bash dest=~{{ dotfiles_user }}/.symfony2-autocomplete.bash owner={{ dotfiles_user }} state=link
+

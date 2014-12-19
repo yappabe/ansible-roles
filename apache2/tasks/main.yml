@@ -1,0 +1,19 @@
+---
+- name: Enable multiverse repositories
+  apt_repository: repo='{{ item }}' state=present
+  with_items:
+    - deb http://archive.ubuntu.com/ubuntu trusty multiverse
+    - deb http://archive.ubuntu.com/ubuntu trusty-updates multiverse
+    - deb http://security.ubuntu.com/ubuntu trusty-security multiverse
+
+- name: Install apache2
+  apt: pkg={{ item }} state=installed
+  with_items:
+    - apache2
+    - libapache2-mod-fastcgi
+
+- name: Enable apache2 modules
+  apache2_module: state=present name={{ item }}
+  with_items: apache2_modules
+  notify:
+    - restart apache2

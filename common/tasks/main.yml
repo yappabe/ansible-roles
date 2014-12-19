@@ -1,0 +1,33 @@
+---
+- name: Install common packages
+  apt: pkg={{ item }} state=installed force=yes
+  with_items:
+    - htop
+    - git
+    - vim
+    - build-essential
+    - libpq-dev
+    - libxml2-dev
+    - libjpeg62
+    - libjpeg62-dev
+    - libfreetype6
+    - libfreetype6-dev
+    - zlib1g-dev
+    - imagemagick
+    - curl
+    - python-dev
+    - python-setuptools
+    - python-mysqldb
+    - python-pycurl
+    - ruby-dev
+    - acl
+
+- name: Install language pack nl
+  apt: pkg=language-pack-nl state=installed
+  ignore_errors: yes
+
+- locale_gen: name={{ item }} state=present
+  with_items:
+    - nl_BE.utf8
+    - nl_NL.utf8
+  ignore_errors: yes

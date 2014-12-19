@@ -1,0 +1,7 @@
+apache2_modules:
+    - rewrite
+    - fastcgi
+    - actions
+    - alias
+    - headers
+    - expires

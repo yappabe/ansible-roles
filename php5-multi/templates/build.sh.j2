@@ -1,0 +1,14 @@
+#!/bin/sh
+./buildconf  --force
+
+{% if item.php5_autoconf_version != False %}
+PHP_AUTOCONF={{ item.php5_autoconf_version }}
+{% endif %}
+
+./configure \
+    {% for configure in php5_default_extensions %}
+    --{{ configure }} \
+    {% endfor %}
+    {% for configure in item.extra_extensions %}
+    --{{ configure }}
+    {% endfor %}

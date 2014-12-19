@@ -1,0 +1,137 @@
+php5_repo: https://github.com/php/php-src.git
+php5_error_logging: E_ALL
+php5_memory_limit: 256M
+php5_error_log_path: /var/log/php/
+php5_build_dir: /opt/build/
+php5_install_dir: /opt/php/
+php5_cli_version: 5.4.36
+php5_socket_version: 5.4.36
+
+php5_versions:
+    - version: 5.3.29
+      extra_extensions: []
+      php5_autoconf_version: autoconf2.13
+      tag: php-5.3.29
+
+    - version: 5.4.36
+      php5_autoconf_version: False
+      extra_extensions: ['enable-intl']
+      tag: php-5.4.36
+
+    - version: 5.5.19
+      extra_extensions: ['enable-intl']
+      php5_autoconf_version: False
+      tag: php-5.5.19
+
+    - version: 5.6.4
+      extra_extensions: ['enable-intl']
+      php5_autoconf_version: False
+      tag: php-5.6.4
+
+    - version: 7.0.0
+      extra_extensions: ['enable-intl']
+      php5_autoconf_version: False
+      tag: master
+
+php5_default_extensions:
+    - enable-fpm
+    - with-mcrypt
+    - enable-mbstring
+    - with-openssl
+    - with-mysql
+    - with-mysql-sock
+    - with-gd
+    - with-jpeg-dir=/usr/lib
+    - enable-gd-native-ttf
+    - with-pdo-mysql
+    - with-libxml-dir=/usr/lib
+    - with-mysqli=/usr/bin/mysql_config
+    - with-curl
+    - enable-zip
+    - enable-sockets
+    - with-zlib
+    - enable-exif
+    - enable-ftp
+    - with-iconv
+    - with-gettext
+    - enable-gd-native-ttf
+    - with-t1lib=/usr
+    - with-freetype-dir=/usr
+    - prefix={{ php5_install_dir }}{{ item.version }}
+    - with-config-file-path={{ php5_install_dir }}{{ item.version }}/etc
+    - with-fpm-user=www-data
+    - with-fpm-group=www-data
+    - enable-soap
+    - enable-wddx
+    - enable-pcntl
+    - enable-bcmath
+    - enable-dba
+    - enable-calendar
+    - with-pdo-sqlite
+    - with-bz2
+    - with-xmlrpc
+    - with-mhash
+    - with-xsl
+    - with-pear
+    - with-readline
+    - enable-mbregex
+    - enable-phar
+    - enable-posix
+    - enable-soap
+    - enable-sysvmsg
+    - enable-sysvsem
+    - enable-sysvshm
+    - enable-inline-optimization
+
+php5_build_dependencies:
+    - build-essential
+    - autoconf
+    - automake
+    - libtool
+    - autoconf2.13
+    # - bison # compiled from source
+    - re2c
+    - libfcgi-dev
+    - libfcgi0ldbl
+    - libjpeg62-dbg
+    - libmcrypt-dev
+    - libssl-dev
+    - libbz2-dev
+    - libjpeg-dev
+    - libfreetype6-dev
+    - libpng12-dev
+    - libxpm-dev
+    - libxml2-dev
+    - libpcre3-dev
+    - libbz2-dev
+    - libcurl4-openssl-dev
+    - libjpeg-dev
+    - libpng12-dev
+    - libxpm-dev
+    - libfreetype6-dev
+    - libmysqlclient-dev
+    - libt1-dev
+    - libgd2-xpm-dev
+    - libgmp-dev
+    - libsasl2-dev
+    - libmhash-dev
+    - unixodbc-dev
+    - freetds-dev
+    - libpspell-dev
+    - libsnmp-dev
+    - libtidy-dev
+    - libxslt1-dev
+    - libmcrypt-dev
+    - libdb5.3-dev
+    - libldap2-dev
+    - icu-devtools
+    - icu-doc
+    - libicu-dev
+    - libicu52
+    - libicu52-dbg
+    - libreadline6
+    - libreadline6-dev
+    - autoconf
+    - libmcrypt-dev
+    - libt1-dev
+    - libsnmp-dev

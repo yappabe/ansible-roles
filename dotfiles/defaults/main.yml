@@ -1,0 +1,5 @@
+dotfiles_user: vagrant
+dotfiles_unclean_branch_icon: ⚡
+dotfiles_git_name: john doe
+dotfiles_git_email: john@doe.com
+dotfiles_git_editor: vim

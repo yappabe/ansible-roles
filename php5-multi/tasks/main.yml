@@ -1,0 +1,94 @@
+---
+
+
+- name: Install PHP build dependencies
+  apt: pkg={{ item }} state=installed
+  with_items: php5_build_dependencies
+
+- include: bison-2.6.4.yml
+
+- name: Create build folder
+  file: path="{{ php5_build_dir }}" recurse=yes state=directory
+  register: update_php_source
+
+- name: Download PHP source
+  git: repo={{ php5_repo }} dest={{ php5_build_dir }}{{ item.version }} version={{ item.tag }} depth=1
+  with_items: php5_versions
+  when: update_php_source.changed
+
+- name: Create install dirs
+  file: path={{ php5_install_dir }}/{{ item.version }}/etc/ recurse=yes state=directory
+  with_items: php5_versions
+
+# This is a strange "bug" where the compiler can't find these headers
+- name: Create freetype folder
+  file: path="/usr/include/freetype2/freetype" recurse=yes state=directory
+
+- name: Symlink freetype.h
+  file: src=/usr/include/freetype2/freetype.h dest=/usr/include/freetype2/freetype/freetype.h state=link
+
+- name: Create build configure file
+  template: src=build.sh.j2 dest={{ php5_build_dir }}/{{ item.version }}/build.sh mode=755
+  with_items: php5_versions
+  when: update_php_source.changed
+
+- name: Build PHP
+  command: ./build.sh chdir="{{ php5_build_dir }}/{{ item.version }}"
+  with_items: php5_versions
+  when: update_php_source.changed
+
+- name: Compile PHP
+  command: make -j{{ ansible_processor_cores }} chdir="{{ php5_build_dir }}/{{ item.version }}"
+  with_items: php5_versions
+  when: update_php_source.changed
+
+- name: Install PHP
+  command: make install chdir="{{ php5_build_dir }}/{{ item.version }}"
+  with_items: php5_versions
+  when: update_php_source.changed
+
+# # 5.3 gave an error
+# - name: Add intl extension from pecl
+#   command: printf "\n" | {{ php5_install_dir }}{ item.version }}/bin/pecl install intl
+#   with_items: php5_versions
+
+- name: Create init.d file
+  template: src=init-script.j2 dest=/etc/init.d/php-{{ item.version }}-fpm mode=755
+  with_items: php5_versions
+
+- name: Create config file
+  template: src=php-fpm.conf.j2 dest={{ php5_install_dir }}{{ item.version }}/etc/php-fpm.conf
+  with_items: php5_versions
+  notify: restart php-fpm versions
+
+- name: Create pool folder
+  file: path="{{ php5_install_dir }}{{ item.version }}/etc/pool.d/" recurse=yes state=directory
+  with_items: php5_versions
+
+- name: Create pool file
+  template: src=pool.j2 dest={{ php5_install_dir }}{{ item.version }}/etc/pool.d/www.conf owner=www-data group=www-data mode=755
+  with_items: php5_versions
+  notify: restart php-fpm versions
+
+- name: Create php.ini file
+  template: src=php-fpm.ini.j2 dest={{ php5_install_dir }}{{ item.version }}/etc/php.ini
+  with_items: php5_versions
+  notify: restart php-fpm versions
+
+- name: Enable PHP service
+  service: name=php-{{ item.version }}-fpm state=started enabled=yes
+  with_items: php5_versions
+  notify: restart php-fpm versions
+
+- name: Enable specific php version (cli)
+  file: src={{ php5_install_dir }}{{ php5_cli_version }}/bin/php dest=/usr/bin/php state=link
+
+- name: Create log folders
+  file: path="{{ php5_error_log_path }}" state=directory owner=www-data group=www-data
+
+- name: Start the engines
+  command: service php-{{ item.version }}-fpm restart
+  with_items: php5_versions
+
+- name: Remove build folder
+  file: path="{{ php5_build_dir }}" state=absent

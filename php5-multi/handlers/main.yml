@@ -1,0 +1,3 @@
+- name: restart php-fpm versions
+  action: service name=php-{{ item.version }}-fpm  state=restarted
+  with_items: php5_versions

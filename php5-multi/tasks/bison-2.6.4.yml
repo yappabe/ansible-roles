@@ -1,0 +1,19 @@
+- name: Download bison
+  get_url: url=http://ftp.gnu.org/gnu/bison/bison-2.6.4.tar.gz dest=/tmp/
+  register: download_bison
+
+- name: Extract bison
+  command: tar -xvzf bison-2.6.4.tar.gz chdir=/tmp/
+  when: download_bison.changed
+
+- name: Build configuration
+  command: ./configure chdir=/tmp/bison-2.6.4
+  when: download_bison.changed
+
+- name: Make bison
+  command: make chdir=/tmp/bison-2.6.4
+  when: download_bison.changed
+
+- name: Make install bison
+  command: make install chdir=/tmp/bison-2.6.4
+  when: download_bison.changed
