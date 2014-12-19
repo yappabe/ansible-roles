@@ -1,0 +1,46 @@
+---
+- name: Check if GitLab configuration file already exists.
+  stat: path=/etc/gitlab/gitlab.rb
+  register: gitlab_config_file
+
+- name: Check if GitLab is already installed.
+  stat: path=/usr/bin/gitlab-ctl
+  register: gitlab_file
+
+- name: Download GitLab .deb package
+  get_url: >
+    url={{ gitlab_package_url }}
+    dest=/tmp/gitlab.deb
+  when: (gitlab_file.stat.exists == false)
+
+- name: Install GitLab .deb package
+  apt: deb=/tmp/gitlab.deb
+
+# Debian-based OSes seem to fail when starting the first time. It'll fix itself
+# with a second restart, so ignore a failure.
+- name: Reconfigure GitLab
+  command: >
+    gitlab-ctl reconfigure
+    creates=/var/opt/gitlab/bootstrapped
+  failed_when: false
+  when: (gitlab_config_file.stat.exists == false)
+
+- name: Create GitLab SSL configuration folder.
+  file: >
+    path=/etc/gitlab/ssl
+    state=directory
+    owner=root group=root mode=700
+  when: gitlab_create_self_signed_cert
+
+- name: Create self-signed certificate.
+  command: >
+    openssl req -new -nodes -x509 -subj "{{ gitlab_self_signed_cert_subj }}" -days 3650 -keyout {{ gitlab_ssl_certificate_key }} -out {{ gitlab_ssl_certificate }} -extensions v3_ca
+    creates={{ gitlab_ssl_certificate }}
+  when: gitlab_create_self_signed_cert
+
+- name: Copy GitLab configuration file.
+  template: >
+    src=gitlab.rb.j2
+    dest=/etc/gitlab/gitlab.rb
+    owner=root group=root mode=600
+  notify: restart gitlab

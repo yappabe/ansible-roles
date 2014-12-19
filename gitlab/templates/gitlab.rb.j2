@@ -1,0 +1,58 @@
+# The URL through which GitLab will be accessed.
+external_url '{{ gitlab_external_url }}'
+
+# Whether to redirect http to https.
+nginx['redirect_http_to_https'] = {{ gitlab_redirect_http_to_https }}
+nginx['ssl_certificate'] = '{{ gitlab_ssl_certificate }}'
+nginx['ssl_certificate_key'] = '{{ gitlab_ssl_certificate_key }}'
+
+git_data_dir '{{ gitlab_git_data_dir }}'
+
+# https://gitlab.com/gitlab-org/gitlab-ce/blob/master/config/gitlab.yml.example#L118
+gitlab_rails['ldap_enabled'] = {{ gitlab_ldap_enabled }}
+gitlab_rails['ldap_host'] = '{{ gitlab_ldap_host }}'
+gitlab_rails['ldap_port'] = {{ gitlab_ldap_port }}
+gitlab_rails['ldap_uid'] = '{{ gitlab_ldap_uid }}'
+gitlab_rails['ldap_method'] = '{{ gitlab_ldap_method}}' # 'ssl' or 'plain'
+gitlab_rails['ldap_bind_dn'] = '{{ gitlab_ldap_bind_dn }}'
+gitlab_rails['ldap_password'] = '{{ gitlab_ldap_password }}'
+gitlab_rails['ldap_allow_username_or_email_login'] = true
+gitlab_rails['ldap_base'] = '{{ gitlab_ldap_base }}'
+gitlab_rails['backup_keep_time'] = {{ gitlab_backup_keep_time }}
+gitlab_rails['gitlab_email_from'] =  '{{ gitlab_email_from }}'
+gitlab_rails['issues_tracker_redmine'] = {{ gitlab_issues_tracker_redmine }}
+gitlab_rails['issues_tracker_redmine_title'] = "Redmine"
+gitlab_rails['issues_tracker_redmine_project_url'] = '{{ gitlab_issues_tracker_redmine_project_url }}'
+gitlab_rails['issues_tracker_redmine_issues_url'] = '{{ gitlab_issues_tracker_redmine_issues_url }}'
+gitlab_rails['issues_tracker_redmine_new_issue_url'] = '{{ gitlab_issues_tracker_redmine_new_issue_url }}'
+
+gitlab_rails['gitlab_extra_sign_in_text'] = '{{ gitlab_extra_sign_in_text }}'
+gitlab_rails['smtp_enable'] = {{ gitlab_smtp_enable }}
+gitlab_rails['smtp_address'] = '{{ gitlab_smtp_address }}'
+gitlab_rails['smtp_port'] = {{ gitlab_smtp_port }}
+gitlab_rails['smtp_user_name'] = '{{ gitlab_smtp_user_name }}'
+gitlab_rails['smtp_password'] = '{{ gitlab_smtp_password }}'
+gitlab_rails['smtp_domain'] = '{{ gitlab_smtp_domain }}'
+gitlab_rails['smtp_authentication'] = '{{ gitlab_smtp_authentication }}'
+gitlab_rails['smtp_enable_starttls_auto'] = {{ gitlab_smtp_enable_starttls_auto }}
+
+logging['logrotate_frequency'] = "daily" # rotate logs daily
+logging['logrotate_size'] = nil # do not rotate by size by default
+logging['logrotate_rotate'] = 30 # keep 30 rotated logs
+logging['logrotate_compress'] = "compress" # see 'man logrotate'
+logging['logrotate_method'] = "copytruncate" # see 'man logrotate'
+logging['logrotate_postrotate'] = nil # no postrotate command by default
+
+{% if gitlab_backup_upload_enabled %}
+gitlab_rails['backup_upload_connection'] = {
+  'provider' => '{{ gitlab_backup_upload_connection_provider }}',
+  'region' => '{{ gitlab_backup_upload_connection_region }}',
+  'aws_access_key_id' => '{{ gitlab_backup_upload_connection_aws_access_key_id }}',
+  'aws_secret_access_key' => '{{ gitlab_backup_upload_connection_aws_secret_access_key }}'
+}
+gitlab_rails['backup_upload_remote_directory'] = '{{ gitlab_backup_upload_remote_directory }}'
+{% endif %}
+
+
+# To change other settings, see:
+# https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md#changing-gitlab-yml-settings
